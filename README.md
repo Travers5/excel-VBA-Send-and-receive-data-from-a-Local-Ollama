@@ -183,6 +183,13 @@ You will get clear runtime errors for:
   - `Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmOllamaPrompt`
 - If you still see the error, delete the failed form object from your VBA project and re-import the updated `frmOllamaPrompt.frm` file.
 
+### “System error &H80004005 …” then “Out of memory” during form import
+- Cause: VBA form/module text files imported with Unix line endings (LF-only) can fail with generic COM/memory errors in some Excel builds.
+- Fix:
+  1. Re-download `frmOllamaPrompt.frm` (and `OllamaSpillModule.bas`) from this repo revision.
+  2. Ensure files are saved with **Windows CRLF** line endings (not LF-only).
+  3. In VBA editor, remove the failed form/module and re-import both files.
+
 ### “Model load failed”
 - Confirm Ollama is running.
 - Check `http://127.0.0.1:11434/api/tags` in browser or curl.
