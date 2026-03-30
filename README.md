@@ -10,7 +10,7 @@ This project gives you two ways to use a local Ollama model from Excel VBA:
 ## Included files
 
 - `OllamaSpillModule.bas` (core logic + callable automation procedures)
-- `frmOllamaPrompt.frm` (GUI form)
+- `frmOllamaPrompt.frm` (GUI form, optional if you only want code-driven automation)
 
 ---
 
@@ -74,6 +74,37 @@ Expected result:
 
 ---
 
+
+## Can this be used without `frmOllamaPrompt.frm` (without GUI)?
+
+Yes. The GUI form file is **optional**. You can import only `OllamaSpillModule.bas` and run everything through macros.
+
+### Procedure (no GUI)
+
+1. Import only `OllamaSpillModule.bas` into your workbook.
+2. Do **not** import `frmOllamaPrompt.frm`.
+3. Create a wrapper macro and run it (example below).
+
+```vb
+Sub RunWithoutGui()
+    RunOllamaForSingleRange _
+        inputRangeAddress:="A1:A20", _
+        outputStartCellAddress:="B1", _
+        modelName:="llama3"
+End Sub
+```
+
+For repeated columns, use `RunOllamaColumnSeries(...)` exactly as shown in the automation section.
+
+### Consequences of not importing the form
+
+- `ShowOllamaPromptGui` will fail because `frmOllamaPrompt` does not exist in that workbook.
+- You lose model/input/output pickers and status text on a form; all parameters must be passed in code.
+- Core features still work: prompt building, calling Ollama, and writing/spilling output to cells.
+
+If you want to keep one codebase that works with or without the form, avoid calling `ShowOllamaPromptGui` in your own macros unless the form is imported.
+
+---
 ## User guide (GUI version)
 
 ### Launch
@@ -184,11 +215,14 @@ You will get clear runtime errors for:
 - If you still see the error, delete the failed form object from your VBA project and re-import the updated `frmOllamaPrompt.frm` file.
 
 ### “System error &H80004005 …” then “Out of memory” during form import
-- Cause: VBA form/module text files imported with Unix line endings (LF-only) can fail with generic COM/memory errors in some Excel builds.
+- Most common causes:
+  1. The `.frm` file has incompatible or corrupted line endings/encoding for your Excel build.
+  2. A previously failed partial form import is still in the VBA project.
 - Fix:
-  1. Re-download `frmOllamaPrompt.frm` (and `OllamaSpillModule.bas`) from this repo revision.
-  2. Ensure files are saved with **Windows CRLF** line endings (not LF-only).
-  3. In VBA editor, remove the failed form/module and re-import both files.
+  1. In the VBA editor, delete any partially imported `frmOllamaPrompt` object first.
+  2. Re-import the latest `frmOllamaPrompt.frm` from this repo.
+  3. If it still fails, open the `.frm` in a text editor and resave as **ANSI or UTF-8 without BOM** with **CRLF** line endings, then import again.
+  4. If your organization blocks UserForms, skip the form entirely and use the non-GUI procedure above (`OllamaSpillModule.bas` only).
 
 ### “Model load failed”
 - Confirm Ollama is running.
