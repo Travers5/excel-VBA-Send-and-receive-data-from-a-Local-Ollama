@@ -152,8 +152,8 @@ This is the additional installable version that can run **at the same time as th
 1. `RunOllamaForSingleRange(inputRangeAddress, outputStartCellAddress, modelName)`  
    Runs one input range and writes result to one output anchor.
 
-2. `RunOllamaColumnSeries(modelName, startColumnIndex, inputStartRow, inputEndRow, outputRow, iterations)`  
-   Repeats the process across columns.
+2. `RunOllamaColumnSeries(modelName, startColumnIndex, inputStartRow, inputEndRow, outputRow, iterations, [recalculateBetweenIterations])`
+   Repeats the process across columns. The optional `recalculateBetweenIterations` argument defaults to `True`, so formulas and dependent cells update after each column run.
 
 3. `Example_RunBtoN()`  
    Ready-made sample:
@@ -185,6 +185,8 @@ End Sub
 
 `iterations:=20` means:
 - B, C, D ... up to 20 columns total from B.
+
+If you are chaining prompts (for example using prior output cells as part of the next column input), keep the default `recalculateBetweenIterations:=True` so each new prompt reads updated worksheet values.
 
 ### How to call this from VBA
 
