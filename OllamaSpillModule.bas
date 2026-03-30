@@ -116,7 +116,7 @@ Public Function GetAvailableModels() As Collection
     body = HttpGet(OLLAMA_BASE_URL & "/api/tags")
 
     Dim matches As Object
-    Set matches = RegexFindAll(body, "\"name\"\s*:\s*\"([^\"]+)\"")
+    Set matches = RegexFindAll(body, """name""\s*:\s*""([^""]+)""")
 
     Dim i As Long
     For i = 0 To matches.Count - 1
@@ -145,7 +145,7 @@ Public Function GenerateFromOllama(ByVal modelName As String, ByVal promptText A
     body = HttpPostJson(OLLAMA_BASE_URL & "/api/generate", payload)
 
     Dim matches As Object
-    Set matches = RegexFindAll(body, "\"response\"\s*:\s*\"((?:\\.|[^\"])*)\"")
+    Set matches = RegexFindAll(body, """response""\s*:\s*""((?:\\.|[^""])*)""")
     If matches.Count = 0 Then
         Err.Raise vbObjectError + 1102, "GenerateFromOllama", "No response field found in Ollama output."
     End If
@@ -279,7 +279,7 @@ Private Function JsonEscape(ByVal value As String) As String
     Dim s As String
     s = value
     s = Replace(s, "\", "\\")
-    s = Replace(s, """", "\"")
+    s = Replace(s, """", Chr$(92) & """")
     s = Replace(s, vbCrLf, "\n")
     s = Replace(s, vbCr, "\n")
     s = Replace(s, vbLf, "\n")
@@ -293,7 +293,7 @@ Private Function JsonUnescape(ByVal value As String) As String
     s = Replace(s, "\n", vbLf)
     s = Replace(s, "\r", vbCr)
     s = Replace(s, "\t", vbTab)
-    s = Replace(s, "\""", """)
+    s = Replace(s, Chr$(92) & """", """")
     s = Replace(s, ChrW$(&HFFFF), "\")
     JsonUnescape = s
 End Function
