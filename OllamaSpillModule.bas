@@ -25,7 +25,8 @@ Public Sub RunOllamaColumnSeries( _
     ByVal inputStartRow As Long, _
     ByVal inputEndRow As Long, _
     ByVal outputRow As Long, _
-    ByVal iterations As Long)
+    ByVal iterations As Long, _
+    Optional ByVal recalculateBetweenIterations As Boolean = True)
 
     If startColumnIndex <= 0 Then
         Err.Raise vbObjectError + 1400, "RunOllamaColumnSeries", "startColumnIndex must be >= 1."
@@ -55,6 +56,11 @@ Public Sub RunOllamaColumnSeries( _
         outputAddress = ws.Cells(outputRow, columnIndex).Address(False, False)
 
         RunOllamaForSingleRange inputAddress, outputAddress, modelName
+
+        If recalculateBetweenIterations Then
+            Application.Calculate
+            DoEvents
+        End If
     Next i
 End Sub
 
