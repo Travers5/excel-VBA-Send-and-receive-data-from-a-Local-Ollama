@@ -9,6 +9,65 @@ Public Sub ShowOllamaPromptGui()
     frmOllamaPrompt.Show
 End Sub
 
+Public Sub RunOllamaForSingleRange(ByVal inputRangeAddress As String, ByVal outputStartCellAddress As String, ByVal modelName As String)
+    Dim prompt As String
+    prompt = GetPromptFromRanges(inputRangeAddress)
+
+    Dim responseText As String
+    responseText = GenerateFromOllama(modelName, prompt)
+
+    WriteSpilledText outputStartCellAddress, responseText
+End Sub
+
+Public Sub RunOllamaColumnSeries( _
+    ByVal modelName As String, _
+    ByVal startColumnIndex As Long, _
+    ByVal inputStartRow As Long, _
+    ByVal inputEndRow As Long, _
+    ByVal outputRow As Long, _
+    ByVal iterations As Long)
+
+    If startColumnIndex <= 0 Then
+        Err.Raise vbObjectError + 1400, "RunOllamaColumnSeries", "startColumnIndex must be >= 1."
+    End If
+    If inputStartRow <= 0 Or inputEndRow <= 0 Or outputRow <= 0 Then
+        Err.Raise vbObjectError + 1401, "RunOllamaColumnSeries", "Row values must be >= 1."
+    End If
+    If inputEndRow < inputStartRow Then
+        Err.Raise vbObjectError + 1402, "RunOllamaColumnSeries", "inputEndRow must be >= inputStartRow."
+    End If
+    If iterations <= 0 Then
+        Err.Raise vbObjectError + 1403, "RunOllamaColumnSeries", "iterations must be >= 1."
+    End If
+
+    Dim ws As Worksheet
+    Set ws = ActiveSheet
+
+    Dim i As Long
+    For i = 0 To iterations - 1
+        Dim columnIndex As Long
+        columnIndex = startColumnIndex + i
+
+        Dim inputAddress As String
+        inputAddress = ws.Range(ws.Cells(inputStartRow, columnIndex), ws.Cells(inputEndRow, columnIndex)).Address(False, False)
+
+        Dim outputAddress As String
+        outputAddress = ws.Cells(outputRow, columnIndex).Address(False, False)
+
+        RunOllamaForSingleRange inputAddress, outputAddress, modelName
+    Next i
+End Sub
+
+Public Sub Example_RunBtoN()
+    RunOllamaColumnSeries _
+        modelName:="llama3", _
+        startColumnIndex:=2, _
+        inputStartRow:=1, _
+        inputEndRow:=56, _
+        outputRow:=61, _
+        iterations:=13
+End Sub
+
 Public Function GetPromptFromRanges(ByVal rangeExpression As String) As String
     Dim cleaned As String
     cleaned = Replace(rangeExpression, vbCr, vbNullString)
