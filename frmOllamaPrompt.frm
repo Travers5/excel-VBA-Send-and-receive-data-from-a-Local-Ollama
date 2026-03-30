@@ -1,5 +1,5 @@
 VERSION 5.00
-Begin VB.UserForm frmOllamaPrompt
+Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmOllamaPrompt
    Caption         =   "Ollama Prompt Builder"
    ClientHeight    =   6240
    ClientLeft      =   120

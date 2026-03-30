@@ -177,6 +177,12 @@ You will get clear runtime errors for:
 
 ## Troubleshooting
 
+### “Format class contained in frmOllamaPrompt.frm is not supported in VBA”
+- Cause: the form header must use the VBA UserForm class GUID, not VB6 `Begin VB.UserForm` syntax.
+- Fix in this repo: `frmOllamaPrompt.frm` now uses:
+  - `Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmOllamaPrompt`
+- If you still see the error, delete the failed form object from your VBA project and re-import the updated `frmOllamaPrompt.frm` file.
+
 ### “Model load failed”
 - Confirm Ollama is running.
 - Check `http://127.0.0.1:11434/api/tags` in browser or curl.
